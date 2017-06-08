@@ -123,12 +123,21 @@ if [ -n "$FROM_ID" ] || [ -n "$FROM_ID" ]; then
 fi
 
 # get the repo URL
-# might like http://user@website/repo
-BASE_URL="http://`git config --get remote.origin.url | awk -F"@" '{print $2}'`"
+BASE_URL=`git config --get remote.origin.url`
+if [ -z "$BASE_URL" ]; then
+	>&2 echo "ERROR: Failed to fetch repository URL. Might not be a GIT repository."
+	exit 1
+fi
+
+if [[ $BASE_URL =~ "@" ]]; then
+	BASE_URL="`echo $BASE_URL | awk -F":" '{print $1}'`://`echo $BASE_URL | awk -F"@" '{print $2}'`"
+fi
+
 LENGTH=${#BASE_URL}
 if [ ${BASE_URL:$LENGTH-4:4} == ".git" ]; then
 	BASE_URL=${BASE_URL:0:$LENGTH-4}
 fi
+
 COMMIT_URL="$BASE_URL/commit"
 COMPARE_URL="$BASE_URL/compare"
 
