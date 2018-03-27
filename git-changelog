@@ -14,6 +14,7 @@ ADD_COMMIT_URL=1
 TMP_LOG_FILE="/tmp/gitlog.tmp"
 TMP_OUTPUT_FILE="/tmp/gitlog.output.md"
 SHOW_HELP=0
+OUTPUT_FILENAME=""
 
 ADD_IDX=0
 REMOVE_IDX=1
@@ -39,6 +40,11 @@ while [ $# -gt 0 ]
 do
 	key="$1"
 	case $key in
+		# output file name
+		'--of')
+			OUTPUT_FILENAME="$2"
+			shift # past argument
+			;;
 		# output file format
 		'--file-format')
 			FILE_FORMAT="$2"
@@ -242,5 +248,11 @@ case $FILE_FORMAT in
 		;;
 esac
 
-# display it
-cat $TMP_OUTPUT_FILE
+if [ -n "$OUTPUT_FILENAME" ]; then
+	# copy it
+	echo "Generating : $OUTPUT_FILENAME"
+	cp $TMP_OUTPUT_FILE $OUTPUT_FILENAME
+else
+	# display it
+	cat $TMP_OUTPUT_FILE
+fi
